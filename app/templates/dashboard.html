@@ -1,4 +1,96 @@
 {% extends "base.html" %} {% block content %}
-<h2>Welcome, {{ current_user.username }}!</h2>
-<p>This is your dashboard.</p>
+<div class="row">
+  <div class="col-md-8">
+    <h2>Your Tasks</h2>
+    <a href="{{ url_for('main.create_task') }}" class="btn btn-primary mb-3"
+      >+ Add Task</a
+    >
+
+    {% if tasks %}
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Due Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for task in tasks %}
+        <tr>
+          <td>{{ task.title }}</td>
+          <td>{{ task.due_date }}</td>
+          <td>{{ task.status }}</td>
+          <td>
+            <a
+              href="{{ url_for('main.edit_task', task_id=task.id) }}"
+              class="btn btn-sm btn-warning"
+              >Edit</a
+            >
+            <form
+              method="POST"
+              action="{{ url_for('main.delete_task', task_id=task.id) }}"
+              style="display: inline"
+            >
+              <button
+                type="submit"
+                class="btn btn-sm btn-danger"
+                onclick="return confirm('Delete this task?')"
+              >
+                Delete
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>No tasks added yet.</p>
+    {% endif %}
+  </div>
+
+  <div class="col-md-4">
+    <!-- Weather Card -->
+    {% if weather %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Weather in {{ city }}</h5>
+        <p class="card-text">
+          Temperature: {{ weather.temperature }} °C<br />
+          Wind Speed: {{ weather.windspeed }} km/h<br />
+          Condition Code: {{ weather.weathercode }}
+        </p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Joke Card -->
+    <div class="card" id="joke-card" style="display: none">
+      <div class="card-body">
+        <h5 class="card-title">Today's Jokes</h5>
+        <ul id="joke-list"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    fetch("/api/jokes")
+        .then(response => response.json())
+        .then(data => {
+            const jokeList = document.getElementById("joke-list");
+            if (data.length > 0) {
+                document.getElementById("joke-card").style.display = "block";
+                data.forEach(joke => {
+                    const li = document.createElement("li");
+                    li.innerHTML = `${joke.setup} - <strong>${joke.punchline}</strong>`;
+                    jokeList.appendChild(li);
+                });
+            }
+        })
+        .catch(error => console.error("Failed to load jokes:", error));
+});
+</script>
 {% endblock %}

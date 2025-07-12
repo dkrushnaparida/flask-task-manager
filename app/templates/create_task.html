@@ -1,0 +1,28 @@
+{% extends "base.html" %} {% block content %}
+<h2>{{ legend }}</h2>
+<form method="POST">
+  {{ form.hidden_tag() }}
+  <div class="mb-3">
+    {{ form.title.label(class="form-label") }} {{
+    form.title(class="form-control") }}
+  </div>
+  <div class="mb-3">
+    {{ form.description.label(class="form-label") }} {{
+    form.description(class="form-control") }}
+  </div>
+  <div class="mb-3">
+    {{ form.due_date.label(class="form-label") }}
+    {% if legend == "Edit Task" %}
+        {{ form.due_date(class="form-control", readonly=true) }}
+    {% else %}
+        {{ form.due_date(class="form-control", min=today) }}
+    {% endif %}
+  </div>
+
+  <div class="mb-3">
+    {{ form.status.label(class="form-label") }} {{
+    form.status(class="form-select") }}
+  </div>
+  {{ form.submit(class="btn btn-success") }}
+</form>
+{% endblock %}
